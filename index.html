@@ -2,111 +2,136 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f8f5ef">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f4ee">
 <title>2人の思い出マップ</title>
 <style>
-*{box-sizing:border-box} :root{--ink:#2f403c;--muted:#8d8b84;--green:#4f8f83;--cream:#f8f5ef;--line:#e9e3d8;--pink:#df8fa2}
-body{margin:0;background:linear-gradient(#faf8f3,#f7f2ed);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
-.app{max-width:720px;margin:auto;padding:18px 14px 70px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.brand{display:flex;align-items:center;gap:10px} .brand-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#e9f4f1;color:var(--green);font-size:21px}
-h1{font-family:Georgia,"Yu Mincho",serif;font-size:23px;margin:0} .sub{font-size:11px;color:var(--muted);margin:3px 0 0}
-.menu{border:1px solid var(--line);background:white;border-radius:50%;width:38px;height:38px}
+*{box-sizing:border-box}
+:root{--ink:#30423d;--muted:#8d8c85;--green:#4e8e82;--cream:#f7f4ee;--line:#e8e1d7;--pink:#db8da0}
+body{margin:0;background:linear-gradient(#faf8f3,#f6f1eb);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+.app{max-width:760px;margin:auto;padding:18px 14px 70px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.brand{display:flex;gap:10px;align-items:center} .brandicon{width:38px;height:38px;border-radius:50%;background:#e9f3f0;color:var(--green);display:grid;place-items:center;font-size:21px}
+h1{font-family:Georgia,"Yu Mincho",serif;font-size:23px;margin:0} .sub{margin:3px 0 0;color:var(--muted);font-size:11px}
+.menu{border:1px solid var(--line);background:#fff;border-radius:50%;width:38px;height:38px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 10px;box-shadow:0 8px 20px #8f80640d}
-.stat span{display:block;font-size:9px;color:var(--muted)} .stat b{display:block;font-family:Georgia,"Yu Mincho",serif;font-size:19px;margin-top:3px} .stat strong{color:var(--green);font-size:24px}
-.card{background:white;border:1px solid var(--line);border-radius:24px;box-shadow:0 15px 40px #8f806412;overflow:hidden}
-.card-head{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 16px 4px} .card-head h2{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:20px} .card-head p{font-size:10px;color:var(--muted);margin:4px 0} .badge{font-size:9px;color:var(--green);letter-spacing:.15em}
-.mapbox{position:relative;height:610px;margin:0 8px 8px;border-radius:18px;overflow:hidden;background:
-radial-gradient(circle at 20% 22%,#e7f2ef 0 3%,transparent 15%),
-radial-gradient(circle at 78% 72%,#edf5f4 0 4%,transparent 18%),
-linear-gradient(180deg,#fbfcf9,#f4f8f5)}
-.note{position:absolute;left:18px;top:75px;font-family:Georgia,"Yu Mincho",serif;color:#aaa69c;font-size:15px;line-height:1.8;transform:rotate(-7deg)}
-svg{width:100%;height:100%}
-.region{stroke:#fff;stroke-width:4;stroke-linejoin:round;filter:drop-shadow(0 5px 7px #40504a20)}
-.hokkaido{fill:#b9dce1}.tohoku{fill:#bedcbc}.kanto{fill:#b8d7b2}.chubu{fill:#d6dfa9}.kansai{fill:#efd797}.chugoku{fill:#efc49a}.shikoku{fill:#efb5a6}.kyushu,.okinawa{fill:#e8b4bd}
-.pref-marker{cursor:pointer} .pref-marker circle{fill:#fff;stroke:#6e928a;stroke-width:2;transition:.2s} .pref-marker text{font-size:7px;font-weight:800;text-anchor:middle;fill:#587069;pointer-events:none}
-.pref-marker.visited circle{fill:var(--pink);stroke:white;stroke-width:3;filter:drop-shadow(0 3px 4px #4e31384a)} .pref-marker.visited text{fill:white}
-.legend{display:flex;justify-content:center;gap:18px;padding:5px 0 14px;font-size:10px;color:var(--muted)} .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px} .l1{background:#fff;border:1px solid #6e928a} .l2{background:var(--pink)}
-.memory-sec{margin-top:20px} .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px} .section-title h2{font-family:Georgia,"Yu Mincho",serif;font-size:20px;margin:0} .section-title p{font-size:10px;color:var(--muted);margin:3px 0}
-.memories{display:grid;grid-template-columns:repeat(2,1fr);gap:10px} .memory{background:white;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 7px 20px #8f80640f} .memory img,.ph{width:100%;height:130px;object-fit:cover} .ph{display:grid;place-items:center;background:#eef4f1;font-size:30px} .mbody{padding:9px} .mbody h3{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:15px} .mbody small{color:var(--muted);font-size:10px} .mbody p{font-size:11px;margin:5px 0} .empty{grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-size:12px}
-dialog{border:0;border-radius:24px;width:min(92%,460px);padding:0;box-shadow:0 25px 80px #273d3860} dialog::backdrop{background:#20312d77} form{padding:20px} .dhead{display:flex;justify-content:space-between;align-items:start} .dhead small{color:var(--green);letter-spacing:.12em;font-size:9px} .dhead h2{font-family:Georgia,"Yu Mincho",serif;margin:3px 0} .x{border:0;background:none;font-size:24px}
-label{display:block;font-size:11px;font-weight:700;margin-top:13px} input,textarea{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit} .upload{border:1px dashed #abc0b9;border-radius:13px;padding:13px;text-align:center;color:var(--green)} .upload input{display:none} .preview{display:none;width:100%;max-height:230px;object-fit:cover;border-radius:13px;margin-top:10px} .actions{display:flex;gap:8px;margin-top:15px} .actions button{border:0;border-radius:12px;padding:12px;font-weight:700} .primary{flex:1;background:var(--green);color:white} .danger{background:#f7e9eb;color:#a65d6a}
-@media(max-width:430px){.mapbox{height:545px} .stats .stat{padding:9px 7px} .stat b{font-size:15px} .stat strong{font-size:20px}}
+.stat{background:#fff;border:1px solid var(--line);border-radius:17px;padding:11px 9px;box-shadow:0 8px 22px #8d806212}
+.stat small{display:block;color:var(--muted);font-size:9px} .stat b{font-family:Georgia,"Yu Mincho",serif;font-size:17px} .stat strong{font-size:24px;color:var(--green)}
+.card{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 15px 42px #87775f16}
+.head{display:flex;justify-content:space-between;padding:16px 16px 4px} .head h2,.section h2{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:21px} .head p,.section p{font-size:10px;color:var(--muted);margin:4px 0}
+.badge{font-size:9px;letter-spacing:.14em;color:var(--green)}
+.maparea{margin:4px 10px 10px;border-radius:18px;min-height:560px;background:
+radial-gradient(circle at 25% 25%,#e8f3f0 0 2%,transparent 16%),
+linear-gradient(#fbfcf9,#f2f7f4);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.mapnote{position:absolute;left:18px;top:45px;color:#aaa69c;font-family:Georgia,"Yu Mincho",serif;line-height:1.8;transform:rotate(-7deg);z-index:0}
+#japanMap{width:100%;max-width:610px;position:relative;z-index:1}
+#japanMap svg{max-width:100%!important;height:auto!important}
+#japanMap path,#japanMap polygon{transition:fill .2s,filter .2s;cursor:pointer}
+.legend{display:flex;justify-content:center;gap:18px;color:var(--muted);font-size:10px;padding:5px 0 14px} .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px} .before{background:#c8dfd5} .after{background:var(--pink)}
+.section{margin-top:20px} .memories{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.memory{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 7px 20px #8b806414}
+.memory img,.ph{width:100%;height:135px;object-fit:cover} .ph{display:grid;place-items:center;background:#edf4f1;font-size:30px} .mbody{padding:9px} .mbody h3{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:15px} .mbody small{color:var(--muted);font-size:10px} .mbody p{font-size:11px;margin:5px 0}
+.empty{grid-column:1/-1;text-align:center;padding:28px;color:var(--muted);font-size:12px}
+dialog{border:0;border-radius:24px;width:min(92%,470px);padding:0;box-shadow:0 25px 80px #273d3860}dialog::backdrop{background:#20312d77}
+form{padding:20px} .dhead{display:flex;justify-content:space-between} .dhead small{font-size:9px;letter-spacing:.13em;color:var(--green)} .dhead h2{font-family:Georgia,"Yu Mincho",serif;margin:3px 0} .x{border:0;background:none;font-size:24px}
+label{display:block;margin-top:13px;font-size:11px;font-weight:700} input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:5px;font:inherit}
+.upload{border:1px dashed #aabeb8;border-radius:13px;padding:14px;text-align:center;color:var(--green)} .upload input{display:none}
+.preview{display:none;width:100%;max-height:240px;object-fit:cover;border-radius:13px;margin-top:11px}
+.actions{display:flex;gap:8px;margin-top:16px} .actions button{border:0;border-radius:12px;padding:12px;font-weight:700} .primary{flex:1;background:var(--green);color:#fff} .danger{background:#f7e9ec;color:#a55f6d}
+@media(max-width:430px){.maparea{min-height:510px} .stat{padding:9px 7px} .stat strong{font-size:21px}}
 </style>
 </head>
 <body>
 <main class="app">
 <header>
- <div class="brand"><div class="brand-icon">⌖</div><div><h1>2人の思い出マップ</h1><p class="sub">ふたりの旅の記録を、日本地図に残そう</p></div></div>
- <button class="menu" id="resetBtn">⋯</button>
+ <div class="brand"><div class="brandicon">⌖</div><div><h1>2人の思い出マップ</h1><p class="sub">ふたりの旅の記録を、日本地図に残そう</p></div></div>
+ <button id="resetBtn" class="menu">⋯</button>
 </header>
-
 <section class="stats">
- <div class="stat"><span>訪れた都道府県</span><b><strong id="visitedCount">0</strong> / 47</b></div>
- <div class="stat"><span>思い出写真</span><b><strong id="photoCount">0</strong> 枚</b></div>
- <div class="stat"><span>日本制覇</span><b><strong id="percent">0</strong>%</b></div>
+ <div class="stat"><small>訪れた都道府県</small><b><strong id="visited">0</strong> / 47</b></div>
+ <div class="stat"><small>思い出写真</small><b><strong id="photos">0</strong> 枚</b></div>
+ <div class="stat"><small>日本制覇</small><b><strong id="percent">0</strong>%</b></div>
 </section>
-
 <section class="card">
- <div class="card-head"><div><h2>思い出マップ</h2><p>丸をタップして写真・日付・メモを追加</p></div><div class="badge">JAPAN ♡</div></div>
- <div class="mapbox">
-  <div class="note">行った場所を<br>地図に残そう 📷</div>
-  <svg viewBox="0 0 420 700" aria-label="日本の思い出マップ">
-   <path class="region hokkaido" d="M280 45 C300 28 335 30 355 45 L382 42 394 61 380 78 392 95 365 116 330 108 309 122 286 107 292 87 272 72 Z"/><path class="region tohoku" d="M287 145 C308 140 331 152 338 174 L330 205 337 230 326 264 313 294 289 289 281 260 288 230 277 203 285 176 Z"/><path class="region kanto" d="M282 292 C302 286 326 296 343 316 L337 341 348 357 326 378 296 371 279 353 278 326 Z"/><path class="region chubu" d="M215 286 C239 281 266 292 286 310 L286 348 268 376 244 397 213 386 198 358 204 330 Z"/><path class="region kansai" d="M159 356 C179 347 204 355 221 374 L219 405 202 430 174 437 153 421 146 393 Z"/><path class="region chugoku" d="M61 371 C93 363 125 365 157 377 L167 402 146 422 112 429 76 425 48 407 Z"/><path class="region shikoku" d="M108 427 C132 420 159 424 172 443 L158 466 128 478 104 464 98 446 Z"/><path class="region kyushu" d="M30 443 C53 438 76 447 88 465 L78 492 86 516 70 548 48 568 28 552 31 524 18 500 22 472 Z"/><path class="region okinawa" d="M43 620 C52 613 63 616 69 626 L63 638 52 642 44 634 Z"/>
-   <g class="pref-marker" data-pref="北海道" transform="translate(325,75)"><circle r="10"/><text y="3">北</text></g><g class="pref-marker" data-pref="青森" transform="translate(300,175)"><circle r="10"/><text y="3">青</text></g><g class="pref-marker" data-pref="岩手" transform="translate(320,210)"><circle r="10"/><text y="3">岩</text></g><g class="pref-marker" data-pref="宮城" transform="translate(318,250)"><circle r="10"/><text y="3">宮</text></g><g class="pref-marker" data-pref="秋田" transform="translate(285,210)"><circle r="10"/><text y="3">秋</text></g><g class="pref-marker" data-pref="山形" transform="translate(287,250)"><circle r="10"/><text y="3">山</text></g><g class="pref-marker" data-pref="福島" transform="translate(300,287)"><circle r="10"/><text y="3">福</text></g><g class="pref-marker" data-pref="茨城" transform="translate(326,330)"><circle r="10"/><text y="3">茨</text></g><g class="pref-marker" data-pref="栃木" transform="translate(305,318)"><circle r="10"/><text y="3">栃</text></g><g class="pref-marker" data-pref="群馬" transform="translate(284,320)"><circle r="10"/><text y="3">群</text></g><g class="pref-marker" data-pref="埼玉" transform="translate(303,343)"><circle r="10"/><text y="3">埼</text></g><g class="pref-marker" data-pref="千葉" transform="translate(332,355)"><circle r="10"/><text y="3">千</text></g><g class="pref-marker" data-pref="東京" transform="translate(311,358)"><circle r="10"/><text y="3">東</text></g><g class="pref-marker" data-pref="神奈川" transform="translate(301,372)"><circle r="10"/><text y="3">神</text></g><g class="pref-marker" data-pref="新潟" transform="translate(260,294)"><circle r="10"/><text y="3">新</text></g><g class="pref-marker" data-pref="富山" transform="translate(232,332)"><circle r="10"/><text y="3">富</text></g><g class="pref-marker" data-pref="石川" transform="translate(213,327)"><circle r="10"/><text y="3">石</text></g><g class="pref-marker" data-pref="福井" transform="translate(199,355)"><circle r="10"/><text y="3">福</text></g><g class="pref-marker" data-pref="山梨" transform="translate(276,355)"><circle r="10"/><text y="3">山</text></g><g class="pref-marker" data-pref="長野" transform="translate(255,335)"><circle r="10"/><text y="3">長</text></g><g class="pref-marker" data-pref="岐阜" transform="translate(225,365)"><circle r="10"/><text y="3">岐</text></g><g class="pref-marker" data-pref="静岡" transform="translate(270,385)"><circle r="10"/><text y="3">静</text></g><g class="pref-marker" data-pref="愛知" transform="translate(238,390)"><circle r="10"/><text y="3">愛</text></g><g class="pref-marker" data-pref="三重" transform="translate(218,405)"><circle r="10"/><text y="3">三</text></g><g class="pref-marker" data-pref="滋賀" transform="translate(202,384)"><circle r="10"/><text y="3">滋</text></g><g class="pref-marker" data-pref="京都" transform="translate(185,382)"><circle r="10"/><text y="3">京</text></g><g class="pref-marker" data-pref="大阪" transform="translate(180,405)"><circle r="10"/><text y="3">大</text></g><g class="pref-marker" data-pref="兵庫" transform="translate(159,395)"><circle r="10"/><text y="3">兵</text></g><g class="pref-marker" data-pref="奈良" transform="translate(198,408)"><circle r="10"/><text y="3">奈</text></g><g class="pref-marker" data-pref="和歌山" transform="translate(187,432)"><circle r="10"/><text y="3">和</text></g><g class="pref-marker" data-pref="鳥取" transform="translate(130,382)"><circle r="10"/><text y="3">鳥</text></g><g class="pref-marker" data-pref="島根" transform="translate(99,390)"><circle r="10"/><text y="3">島</text></g><g class="pref-marker" data-pref="岡山" transform="translate(139,405)"><circle r="10"/><text y="3">岡</text></g><g class="pref-marker" data-pref="広島" transform="translate(107,415)"><circle r="10"/><text y="3">広</text></g><g class="pref-marker" data-pref="山口" transform="translate(72,423)"><circle r="10"/><text y="3">山</text></g><g class="pref-marker" data-pref="徳島" transform="translate(153,444)"><circle r="10"/><text y="3">徳</text></g><g class="pref-marker" data-pref="香川" transform="translate(145,430)"><circle r="10"/><text y="3">香</text></g><g class="pref-marker" data-pref="愛媛" transform="translate(122,449)"><circle r="10"/><text y="3">愛</text></g><g class="pref-marker" data-pref="高知" transform="translate(137,467)"><circle r="10"/><text y="3">高</text></g><g class="pref-marker" data-pref="福岡" transform="translate(55,455)"><circle r="10"/><text y="3">福</text></g><g class="pref-marker" data-pref="佐賀" transform="translate(37,468)"><circle r="10"/><text y="3">佐</text></g><g class="pref-marker" data-pref="長崎" transform="translate(25,487)"><circle r="10"/><text y="3">長</text></g><g class="pref-marker" data-pref="熊本" transform="translate(50,500)"><circle r="10"/><text y="3">熊</text></g><g class="pref-marker" data-pref="大分" transform="translate(73,480)"><circle r="10"/><text y="3">大</text></g><g class="pref-marker" data-pref="宮崎" transform="translate(76,520)"><circle r="10"/><text y="3">宮</text></g><g class="pref-marker" data-pref="鹿児島" transform="translate(49,545)"><circle r="10"/><text y="3">鹿</text></g><g class="pref-marker" data-pref="沖縄" transform="translate(55,640)"><circle r="10"/><text y="3">沖</text></g>
-  </svg>
- </div>
- <div class="legend"><span><i class="l1"></i>まだ</span><span><i class="l2"></i>思い出あり</span></div>
+ <div class="head"><div><h2>思い出マップ</h2><p>都道府県を直接タップして思い出を追加</p></div><div class="badge">JAPAN ♡</div></div>
+ <div class="maparea"><div class="mapnote">行った場所を<br>地図に残そう 📷</div><div id="japanMap"></div></div>
+ <div class="legend"><span><i class="dot before"></i>まだ</span><span><i class="dot after"></i>思い出あり</span></div>
 </section>
-
-<section class="memory-sec">
- <div class="section-title"><div><h2>思い出リスト</h2><p>登録した場所を振り返ろう</p></div></div>
- <div class="memories" id="memoryList"></div>
-</section>
+<section class="section"><h2>思い出リスト</h2><p>登録した場所を振り返ろう</p><div id="memoryList" class="memories"></div></section>
 </main>
 
 <dialog id="editor"><form id="memoryForm">
-<div class="dhead"><div><small>TRAVEL MEMORY</small><h2 id="prefTitle"></h2></div><button type="button" class="x" id="closeBtn">×</button></div>
+<div class="dhead"><div><small>TRAVEL MEMORY</small><h2 id="prefTitle"></h2></div><button type="button" id="closeBtn" class="x">×</button></div>
 <label>行った日<input id="dateInput" type="date"></label>
 <label>思い出メモ<textarea id="noteInput" rows="3" placeholder="ここで何した？"></textarea></label>
 <label class="upload">📷 写真を選ぶ<input id="photoInput" type="file" accept="image/*"></label>
 <img id="preview" class="preview" alt="">
-<div class="actions"><button type="button" id="deleteBtn" class="danger">削除</button><button class="primary" type="submit">思い出を保存 ♡</button></div>
+<div class="actions"><button type="button" id="deleteBtn" class="danger">削除</button><button type="submit" class="primary">思い出を保存 ♡</button></div>
 </form></dialog>
 
+<script src="https://unpkg.com/japan-map-js@1.0.1/dist/jpmap.min.js"></script>
 <script>
-const prefs=["北海道", "青森", "岩手", "宮城", "秋田", "山形", "福島", "茨城", "栃木", "群馬", "埼玉", "千葉", "東京", "神奈川", "新潟", "富山", "石川", "福井", "山梨", "長野", "岐阜", "静岡", "愛知", "三重", "滋賀", "京都", "大阪", "兵庫", "奈良", "和歌山", "鳥取", "島根", "岡山", "広島", "山口", "徳島", "香川", "愛媛", "高知", "福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"];
-let data=JSON.parse(localStorage.getItem("omoideMap")||"{}"),selected="",pendingPhoto="";
+const codeToPref={"1": "北海道", "2": "青森県", "3": "岩手県", "4": "宮城県", "5": "秋田県", "6": "山形県", "7": "福島県", "8": "茨城県", "9": "栃木県", "10": "群馬県", "11": "埼玉県", "12": "千葉県", "13": "東京都", "14": "神奈川県", "15": "新潟県", "16": "富山県", "17": "石川県", "18": "福井県", "19": "山梨県", "20": "長野県", "21": "岐阜県", "22": "静岡県", "23": "愛知県", "24": "三重県", "25": "滋賀県", "26": "京都府", "27": "大阪府", "28": "兵庫県", "29": "奈良県", "30": "和歌山県", "31": "鳥取県", "32": "島根県", "33": "岡山県", "34": "広島県", "35": "山口県", "36": "徳島県", "37": "香川県", "38": "愛媛県", "39": "高知県", "40": "福岡県", "41": "佐賀県", "42": "長崎県", "43": "熊本県", "44": "大分県", "45": "宮崎県", "46": "鹿児島県", "47": "沖縄県"};
+let data=JSON.parse(localStorage.getItem("omoideMap")||"{}"),selected="",pendingPhoto="",mapInstance=null;
 const $=id=>document.getElementById(id);
 function esc(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function render(){
- document.querySelectorAll(".pref-marker").forEach(el=>el.classList.toggle("visited",!!data[el.dataset.pref]));
- const entries=Object.entries(data);
- $("visitedCount").textContent=entries.length;
- $("photoCount").textContent=entries.filter(([,m])=>m.photo).length;
- $("percent").textContent=Math.round(entries.length/47*100);
- const list=$("memoryList"); list.innerHTML="";
- entries.forEach(([p,m])=>{
-  const a=document.createElement("article");a.className="memory";a.onclick=()=>openEditor(p);
-  a.innerHTML=`${m.photo?`<img src="${m.photo}">`:`<div class="ph">📍</div>`}<div class="mbody"><h3>${p}</h3><small>${m.date||"日付なし"}</small><p>${esc(m.note)}</p></div>`;
-  list.appendChild(a);
+function normalizeName(name,code){
+ if(codeToPref[Number(code)]) return codeToPref[Number(code)];
+ if(!name) return "";
+ if(name==="北海道") return name;
+ if(name==="東京") return "東京都";
+ if(name==="京都") return "京都府";
+ if(name==="大阪") return "大阪府";
+ const special=["東京都","京都府","大阪府"];
+ if(special.includes(name)) return name;
+ return /[都道府県]$/.test(name)?name:name+"県";
+}
+function buildMap(){
+ const areas=[];
+ for(let code=1;code<=47;code++){
+   const p=codeToPref[code];
+   areas.push({code,color:data[p]?"#db8da0":"#c8dfd5"});
+ }
+ document.getElementById("japanMap").innerHTML="";
+ mapInstance=new jpmap.japanMap(document.getElementById("japanMap"),{
+   areas,
+   width:520,
+   drawsBoxLine:false,
+   showsPrefectureName:false,
+   movesIslands:true,
+   borderLineColor:"#ffffff",
+   borderLineWidth:1,
+   onSelect:function(info){
+     const pref=normalizeName(info.name,info.code);
+     if(pref) openEditor(pref);
+   }
  });
- if(!entries.length)list.innerHTML='<div class="empty">まだ思い出がありません。<br>地図の丸をタップして最初の旅を残そう 📷</div>';
+}
+function render(){
+ const entries=Object.entries(data);
+ $("visited").textContent=entries.length;
+ $("photos").textContent=entries.filter(([,m])=>m.photo).length;
+ $("percent").textContent=Math.round(entries.length/47*100);
+ const list=$("memoryList");list.innerHTML="";
+ entries.forEach(([p,m])=>{
+   const a=document.createElement("article");a.className="memory";a.onclick=()=>openEditor(p);
+   a.innerHTML=`${m.photo?`<img src="${m.photo}">`:`<div class="ph">📍</div>`}<div class="mbody"><h3>${p}</h3><small>${m.date||"日付なし"}</small><p>${esc(m.note)}</p></div>`;
+   list.appendChild(a);
+ });
+ if(!entries.length) list.innerHTML='<div class="empty">まだ思い出がありません。<br>日本地図の都道府県をタップして登録しよう 📷</div>';
+ buildMap();
 }
 function openEditor(p){
- selected=p; pendingPhoto=data[p]?.photo||"";
- $("prefTitle").textContent=p; $("dateInput").value=data[p]?.date||""; $("noteInput").value=data[p]?.note||"";
- showPreview(pendingPhoto); $("deleteBtn").style.visibility=data[p]?"visible":"hidden"; $("editor").showModal();
+ selected=p;pendingPhoto=data[p]?.photo||"";
+ $("prefTitle").textContent=p;$("dateInput").value=data[p]?.date||"";$("noteInput").value=data[p]?.note||"";
+ showPreview(pendingPhoto);$("deleteBtn").style.visibility=data[p]?"visible":"hidden";$("editor").showModal();
 }
 function showPreview(src){const im=$("preview");if(src){im.src=src;im.style.display="block"}else{im.removeAttribute("src");im.style.display="none"}}
-document.querySelectorAll(".pref-marker").forEach(el=>el.addEventListener("click",()=>openEditor(el.dataset.pref)));
 $("photoInput").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingPhoto=r.result;showPreview(pendingPhoto)};r.readAsDataURL(f)};
 $("memoryForm").onsubmit=e=>{e.preventDefault();data[selected]={date:$("dateInput").value,note:$("noteInput").value,photo:pendingPhoto};localStorage.setItem("omoideMap",JSON.stringify(data));$("editor").close();$("photoInput").value="";render()};
 $("deleteBtn").onclick=()=>{if(confirm(selected+"の思い出を削除する？")){delete data[selected];localStorage.setItem("omoideMap",JSON.stringify(data));$("editor").close();render()}};
 $("closeBtn").onclick=()=>$("editor").close();
 $("resetBtn").onclick=()=>{if(confirm("すべての思い出を消す？")){data={};localStorage.setItem("omoideMap","{}");render()}};
-render();
+window.addEventListener("load",()=>{if(window.jpmap)render();else alert("地図の読み込みに失敗しました。通信を確認して再読み込みしてください。")});
 </script>
 </body></html>
