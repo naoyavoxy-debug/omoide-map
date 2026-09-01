@@ -133,9 +133,41 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;paddin
 <div class="actions"><button type="button" id="deleteBtn" class="danger">削除</button><button type="submit" class="primary">思い出を保存 ♡</button></div>
 </form></dialog>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getFirestore, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDMSBCXmKIro1U65sdhxHEUoTYdZzSrqmc",
+  authDomain: "omoide-map-617c9.firebaseapp.com",
+  projectId: "omoide-map-617c9",
+  storageBucket: "omoide-map-617c9.firebasestorage.app",
+  messagingSenderId: "627118409527",
+  appId: "1:627118409527:web:ac0ba20916db565a337cb2"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const sharedDoc = doc(db, "shared", "memories");
+
 const codeToPref={"01": "北海道", "02": "青森県", "03": "岩手県", "04": "宮城県", "05": "秋田県", "06": "山形県", "07": "福島県", "08": "茨城県", "09": "栃木県", "10": "群馬県", "11": "埼玉県", "12": "千葉県", "13": "東京都", "14": "神奈川県", "15": "新潟県", "16": "富山県", "17": "石川県", "18": "福井県", "19": "山梨県", "20": "長野県", "21": "岐阜県", "22": "静岡県", "23": "愛知県", "24": "三重県", "25": "滋賀県", "26": "京都府", "27": "大阪府", "28": "兵庫県", "29": "奈良県", "30": "和歌山県", "31": "鳥取県", "32": "島根県", "33": "岡山県", "34": "広島県", "35": "山口県", "36": "徳島県", "37": "香川県", "38": "愛媛県", "39": "高知県", "40": "福岡県", "41": "佐賀県", "42": "長崎県", "43": "熊本県", "44": "大分県", "45": "宮崎県", "46": "鹿児島県", "47": "沖縄県"};
 let data=JSON.parse(localStorage.getItem("omoideMap")||"{}");
+let cloudReady=false;
+function saveLocalPhotos(){ localStorage.setItem("omoideMap",JSON.stringify(data)); }
+function cloudPayload(){
+  const out={};
+  Object.entries(data).forEach(([p,m])=>{ out[p]={date:m.date||"",note:m.note||""}; });
+  return out;
+}
+async function saveCloud(){
+  await setDoc(sharedDoc,{memories:cloudPayload(),updatedAt:Date.now()});
+}
+function mergeCloud(cloud){
+  const local=data; const merged={};
+  Object.entries(cloud||{}).forEach(([p,m])=>{
+    merged[p]={date:m?.date||"",note:m?.note||"",photos:getPhotos(local[p])};
+  });
+  data=merged; saveLocalPhotos(); render();
+}
 let selected="", pendingPhotos=[];
 const $=id=>document.getElementById(id);
 
@@ -220,7 +252,7 @@ function migrateOldPhotoData(){
       changed=true;
     }
   });
-  if(changed) localStorage.setItem("omoideMap",JSON.stringify(data));
+  if(changed) saveLocalPhotos();
 }
 
 function updatePhotoPreview(){
@@ -315,35 +347,38 @@ $("photoInput").onchange=async e=>{
  e.target.value="";
 };
 
-$("memoryForm").onsubmit=e=>{
+$("memoryForm").onsubmit=async e=>{
  e.preventDefault();
  data[selected]={
    date:$("dateInput").value,
    note:$("noteInput").value,
    photos:pendingPhotos.slice(0,5)
  };
- localStorage.setItem("omoideMap",JSON.stringify(data));
+ saveLocalPhotos();
  $("editor").close();
  $("photoInput").value="";
  render();
+ try{ await saveCloud(); }catch(err){ alert("共有保存に失敗しました。通信を確認してください。"); }
 };
 
-$("deleteBtn").onclick=()=>{
+$("deleteBtn").onclick=async()=>{
  if(confirm(selected+"の思い出を削除する？")){
    delete data[selected];
-   localStorage.setItem("omoideMap",JSON.stringify(data));
+   saveLocalPhotos();
    $("editor").close();
    render();
+   try{ await saveCloud(); }catch(err){ alert("共有削除に失敗しました。通信を確認してください。"); }
  }
 };
 
 $("closeBtn").onclick=()=>$("editor").close();
 
-$("resetBtn").onclick=()=>{
+$("resetBtn").onclick=async()=>{
  if(confirm("すべての思い出を消す？")){
    data={};
-   localStorage.setItem("omoideMap","{}");
+   saveLocalPhotos();
    render();
+   try{ await saveCloud(); }catch(err){ alert("共有データの削除に失敗しました。"); }
  }
 };
 
@@ -351,6 +386,14 @@ window.addEventListener("DOMContentLoaded",async()=>{
  migrateOldPhotoData();
  render();
  await loadMap();
+ onSnapshot(sharedDoc,async snap=>{
+   if(snap.exists()){
+     mergeCloud(snap.data().memories||{});
+   }else if(!cloudReady && Object.keys(data).length){
+     try{ await saveCloud(); }catch(err){}
+   }
+   cloudReady=true;
+ },err=>{ console.error(err); });
 });
 </script>
 <script>
