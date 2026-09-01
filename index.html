@@ -7,38 +7,77 @@
 <title>2人の思い出マップ</title>
 <style>
 *{box-sizing:border-box}
-:root{--ink:#30423d;--muted:#8d8c85;--green:#4e8e82;--cream:#f7f4ee;--line:#e8e1d7;--pink:#db8da0}
+:root{--ink:#30423d;--muted:#8f8d86;--green:#4e8e82;--cream:#f7f4ee;--line:#e8e1d7;--pink:#df8fa2;--map:#c8dfd5}
 body{margin:0;background:linear-gradient(#faf8f3,#f6f1eb);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
 .app{max-width:760px;margin:auto;padding:18px 14px 70px}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.brand{display:flex;gap:10px;align-items:center} .brandicon{width:38px;height:38px;border-radius:50%;background:#e9f3f0;color:var(--green);display:grid;place-items:center;font-size:21px}
-h1{font-family:Georgia,"Yu Mincho",serif;font-size:23px;margin:0} .sub{margin:3px 0 0;color:var(--muted);font-size:11px}
+.brand{display:flex;gap:10px;align-items:center}
+.brandicon{width:38px;height:38px;border-radius:50%;background:#e9f3f0;color:var(--green);display:grid;place-items:center;font-size:21px}
+h1{font-family:Georgia,"Yu Mincho",serif;font-size:23px;margin:0}
+.sub{margin:3px 0 0;color:var(--muted);font-size:11px}
 .menu{border:1px solid var(--line);background:#fff;border-radius:50%;width:38px;height:38px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:17px;padding:11px 9px;box-shadow:0 8px 22px #8d806212}
-.stat small{display:block;color:var(--muted);font-size:9px} .stat b{font-family:Georgia,"Yu Mincho",serif;font-size:17px} .stat strong{font-size:24px;color:var(--green)}
+.stat small{display:block;color:var(--muted);font-size:9px}
+.stat b{font-family:Georgia,"Yu Mincho",serif;font-size:17px}
+.stat strong{font-size:24px;color:var(--green)}
 .card{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 15px 42px #87775f16}
-.head{display:flex;justify-content:space-between;padding:16px 16px 4px} .head h2,.section h2{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:21px} .head p,.section p{font-size:10px;color:var(--muted);margin:4px 0}
+.head{display:flex;justify-content:space-between;padding:16px 16px 4px}
+.head h2,.section h2{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:21px}
+.head p,.section p{font-size:10px;color:var(--muted);margin:4px 0}
 .badge{font-size:9px;letter-spacing:.14em;color:var(--green)}
-.maparea{margin:4px 10px 10px;border-radius:18px;min-height:560px;background:
+.maparea{margin:4px 10px 10px;border-radius:18px;min-height:520px;background:
 radial-gradient(circle at 25% 25%,#e8f3f0 0 2%,transparent 16%),
-linear-gradient(#fbfcf9,#f2f7f4);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.mapnote{position:absolute;left:18px;top:45px;color:#aaa69c;font-family:Georgia,"Yu Mincho",serif;line-height:1.8;transform:rotate(-7deg);z-index:0}
-#japanMap{width:100%;max-width:610px;position:relative;z-index:1}
-#japanMap svg{max-width:100%!important;height:auto!important}
-#japanMap path,#japanMap polygon{transition:fill .2s,filter .2s;cursor:pointer}
-.legend{display:flex;justify-content:center;gap:18px;color:var(--muted);font-size:10px;padding:5px 0 14px} .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px} .before{background:#c8dfd5} .after{background:var(--pink)}
-.section{margin-top:20px} .memories{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+linear-gradient(#fbfcf9,#f2f7f4);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;padding:18px 8px}
+.mapnote{position:absolute;left:15px;top:38px;color:#aaa69c;font-family:Georgia,"Yu Mincho",serif;line-height:1.8;transform:rotate(-7deg);z-index:0}
+#japanMap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+#japanMap .loading{font-size:12px;color:var(--muted)}
+#japanMap svg{width:100%!important;height:auto!important;max-height:500px!important;display:block}
+#japanMap .prefecture{cursor:pointer;transition:filter .15s,opacity .15s}
+#japanMap .prefecture:hover{filter:brightness(.96)}
+#japanMap .prefecture path,
+#japanMap .prefecture polygon,
+#japanMap .prefecture polyline{fill:var(--map)!important;stroke:#fff!important;stroke-width:1.2!important}
+#japanMap .prefecture.visited path,
+#japanMap .prefecture.visited polygon,
+#japanMap .prefecture.visited polyline{fill:var(--pink)!important}
+#japanMap .boundary-line{stroke:#fff!important}
+.legend{display:flex;justify-content:center;gap:18px;color:var(--muted);font-size:10px;padding:5px 0 14px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.before{background:var(--map)} .after{background:var(--pink)}
+.section{margin-top:20px}
+.memories{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 .memory{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 7px 20px #8b806414}
-.memory img,.ph{width:100%;height:135px;object-fit:cover} .ph{display:grid;place-items:center;background:#edf4f1;font-size:30px} .mbody{padding:9px} .mbody h3{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:15px} .mbody small{color:var(--muted);font-size:10px} .mbody p{font-size:11px;margin:5px 0}
+.memory img,.ph{width:100%;height:135px;object-fit:cover}
+.ph{display:grid;place-items:center;background:#edf4f1;font-size:30px}
+.mbody{padding:9px}
+.mbody h3{font-family:Georgia,"Yu Mincho",serif;margin:0;font-size:15px}
+.mbody small{color:var(--muted);font-size:10px}
+.mbody p{font-size:11px;margin:5px 0}
 .empty{grid-column:1/-1;text-align:center;padding:28px;color:var(--muted);font-size:12px}
-dialog{border:0;border-radius:24px;width:min(92%,470px);padding:0;box-shadow:0 25px 80px #273d3860}dialog::backdrop{background:#20312d77}
-form{padding:20px} .dhead{display:flex;justify-content:space-between} .dhead small{font-size:9px;letter-spacing:.13em;color:var(--green)} .dhead h2{font-family:Georgia,"Yu Mincho",serif;margin:3px 0} .x{border:0;background:none;font-size:24px}
-label{display:block;margin-top:13px;font-size:11px;font-weight:700} input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:5px;font:inherit}
-.upload{border:1px dashed #aabeb8;border-radius:13px;padding:14px;text-align:center;color:var(--green)} .upload input{display:none}
+.error{background:#fff4f4;color:#a45a65;border:1px solid #f0d6dc;padding:14px;border-radius:14px;text-align:center;font-size:12px;line-height:1.7}
+dialog{border:0;border-radius:24px;width:min(92%,470px);padding:0;box-shadow:0 25px 80px #273d3860}
+dialog::backdrop{background:#20312d77}
+form{padding:20px}
+.dhead{display:flex;justify-content:space-between}
+.dhead small{font-size:9px;letter-spacing:.13em;color:var(--green)}
+.dhead h2{font-family:Georgia,"Yu Mincho",serif;margin:3px 0}
+.x{border:0;background:none;font-size:24px}
+label{display:block;margin-top:13px;font-size:11px;font-weight:700}
+input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:5px;font:inherit}
+.upload{border:1px dashed #aabeb8;border-radius:13px;padding:14px;text-align:center;color:var(--green)}
+.upload input{display:none}
 .preview{display:none;width:100%;max-height:240px;object-fit:cover;border-radius:13px;margin-top:11px}
-.actions{display:flex;gap:8px;margin-top:16px} .actions button{border:0;border-radius:12px;padding:12px;font-weight:700} .primary{flex:1;background:var(--green);color:#fff} .danger{background:#f7e9ec;color:#a55f6d}
-@media(max-width:430px){.maparea{min-height:510px} .stat{padding:9px 7px} .stat strong{font-size:21px}}
+.actions{display:flex;gap:8px;margin-top:16px}
+.actions button{border:0;border-radius:12px;padding:12px;font-weight:700}
+.primary{flex:1;background:var(--green);color:#fff}
+.danger{background:#f7e9ec;color:#a55f6d}
+@media(max-width:430px){
+ .maparea{min-height:500px;padding:10px 4px}
+ #japanMap svg{max-height:475px!important}
+ .stat{padding:9px 7px}
+ .stat strong{font-size:21px}
+}
 </style>
 </head>
 <body>
@@ -47,17 +86,26 @@ label{display:block;margin-top:13px;font-size:11px;font-weight:700} input,textar
  <div class="brand"><div class="brandicon">⌖</div><div><h1>2人の思い出マップ</h1><p class="sub">ふたりの旅の記録を、日本地図に残そう</p></div></div>
  <button id="resetBtn" class="menu">⋯</button>
 </header>
+
 <section class="stats">
  <div class="stat"><small>訪れた都道府県</small><b><strong id="visited">0</strong> / 47</b></div>
  <div class="stat"><small>思い出写真</small><b><strong id="photos">0</strong> 枚</b></div>
  <div class="stat"><small>日本制覇</small><b><strong id="percent">0</strong>%</b></div>
 </section>
+
 <section class="card">
- <div class="head"><div><h2>思い出マップ</h2><p>都道府県を直接タップして思い出を追加</p></div><div class="badge">JAPAN ♡</div></div>
- <div class="maparea"><div class="mapnote">行った場所を<br>地図に残そう 📷</div><div id="japanMap"></div></div>
+ <div class="head"><div><h2>思い出マップ</h2><p>都道府県をそのままタップして思い出を追加</p></div><div class="badge">JAPAN ♡</div></div>
+ <div class="maparea">
+   <div class="mapnote">行った場所を<br>地図に残そう 📷</div>
+   <div id="japanMap"><div class="loading">日本地図を読み込み中…</div></div>
+ </div>
  <div class="legend"><span><i class="dot before"></i>まだ</span><span><i class="dot after"></i>思い出あり</span></div>
 </section>
-<section class="section"><h2>思い出リスト</h2><p>登録した場所を振り返ろう</p><div id="memoryList" class="memories"></div></section>
+
+<section class="section">
+ <h2>思い出リスト</h2><p>登録した場所を振り返ろう</p>
+ <div id="memoryList" class="memories"></div>
+</section>
 </main>
 
 <dialog id="editor"><form id="memoryForm">
@@ -69,69 +117,157 @@ label{display:block;margin-top:13px;font-size:11px;font-weight:700} input,textar
 <div class="actions"><button type="button" id="deleteBtn" class="danger">削除</button><button type="submit" class="primary">思い出を保存 ♡</button></div>
 </form></dialog>
 
-<script src="https://unpkg.com/japan-map-js@1.0.1/dist/jpmap.min.js"></script>
 <script>
-const codeToPref={"1": "北海道", "2": "青森県", "3": "岩手県", "4": "宮城県", "5": "秋田県", "6": "山形県", "7": "福島県", "8": "茨城県", "9": "栃木県", "10": "群馬県", "11": "埼玉県", "12": "千葉県", "13": "東京都", "14": "神奈川県", "15": "新潟県", "16": "富山県", "17": "石川県", "18": "福井県", "19": "山梨県", "20": "長野県", "21": "岐阜県", "22": "静岡県", "23": "愛知県", "24": "三重県", "25": "滋賀県", "26": "京都府", "27": "大阪府", "28": "兵庫県", "29": "奈良県", "30": "和歌山県", "31": "鳥取県", "32": "島根県", "33": "岡山県", "34": "広島県", "35": "山口県", "36": "徳島県", "37": "香川県", "38": "愛媛県", "39": "高知県", "40": "福岡県", "41": "佐賀県", "42": "長崎県", "43": "熊本県", "44": "大分県", "45": "宮崎県", "46": "鹿児島県", "47": "沖縄県"};
-let data=JSON.parse(localStorage.getItem("omoideMap")||"{}"),selected="",pendingPhoto="",mapInstance=null;
+const codeToPref={"01": "北海道", "02": "青森県", "03": "岩手県", "04": "宮城県", "05": "秋田県", "06": "山形県", "07": "福島県", "08": "茨城県", "09": "栃木県", "10": "群馬県", "11": "埼玉県", "12": "千葉県", "13": "東京都", "14": "神奈川県", "15": "新潟県", "16": "富山県", "17": "石川県", "18": "福井県", "19": "山梨県", "20": "長野県", "21": "岐阜県", "22": "静岡県", "23": "愛知県", "24": "三重県", "25": "滋賀県", "26": "京都府", "27": "大阪府", "28": "兵庫県", "29": "奈良県", "30": "和歌山県", "31": "鳥取県", "32": "島根県", "33": "岡山県", "34": "広島県", "35": "山口県", "36": "徳島県", "37": "香川県", "38": "愛媛県", "39": "高知県", "40": "福岡県", "41": "佐賀県", "42": "長崎県", "43": "熊本県", "44": "大分県", "45": "宮崎県", "46": "鹿児島県", "47": "沖縄県"};
+let data=JSON.parse(localStorage.getItem("omoideMap")||"{}");
+let selected="", pendingPhoto="";
 const $=id=>document.getElementById(id);
-function esc(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function normalizeName(name,code){
- if(codeToPref[Number(code)]) return codeToPref[Number(code)];
- if(!name) return "";
- if(name==="北海道") return name;
- if(name==="東京") return "東京都";
- if(name==="京都") return "京都府";
- if(name==="大阪") return "大阪府";
- const special=["東京都","京都府","大阪府"];
- if(special.includes(name)) return name;
- return /[都道府県]$/.test(name)?name:name+"県";
+
+function esc(s){
+ return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 }
-function buildMap(){
- const areas=[];
- for(let code=1;code<=47;code++){
-   const p=codeToPref[code];
-   areas.push({code,color:data[p]?"#db8da0":"#c8dfd5"});
+
+async function loadMap(){
+ const container=$("japanMap");
+ try {
+   const url="https://cdn.jsdelivr.net/gh/geolonia/japanese-prefectures@master/map-mobile.svg";
+   const res=await fetch(url,{cache:"no-store"});
+   if(!res.ok) throw new Error("map fetch failed");
+   container.innerHTML=await res.text();
+
+   const svg=container.querySelector("svg");
+   if(!svg) throw new Error("svg missing");
+
+   svg.removeAttribute("width");
+   svg.removeAttribute("height");
+
+   const prefectures=[...container.querySelectorAll(".prefecture")];
+
+   prefectures.forEach(pref=>{
+     let code=String(pref.dataset.code||"").padStart(2,"0");
+     let name=codeToPref[code];
+
+     if(!name){
+       const classes=[...pref.classList];
+       name=classes.find(x=>/[都道府県]$/.test(x));
+     }
+
+     if(!name) return;
+
+     pref.dataset.prefName=name;
+     pref.setAttribute("role","button");
+     pref.setAttribute("tabindex","0");
+     pref.setAttribute("aria-label",name+"の思い出を開く");
+
+     pref.addEventListener("click",e=>{
+       e.preventDefault();
+       e.stopPropagation();
+       openEditor(name);
+     });
+     pref.addEventListener("touchend",e=>{
+       e.preventDefault();
+       openEditor(name);
+     },{passive:false});
+     pref.addEventListener("keydown",e=>{
+       if(e.key==="Enter"||e.key===" ") openEditor(name);
+     });
+   });
+
+   refreshMapColors();
+ } catch(err) {
+   container.innerHTML='<div class="error">日本地図を読み込めませんでした。<br>通信を確認して、ページを再読み込みしてください。</div>';
  }
- document.getElementById("japanMap").innerHTML="";
- mapInstance=new jpmap.japanMap(document.getElementById("japanMap"),{
-   areas,
-   width:520,
-   drawsBoxLine:false,
-   showsPrefectureName:false,
-   movesIslands:true,
-   borderLineColor:"#ffffff",
-   borderLineWidth:1,
-   onSelect:function(info){
-     const pref=normalizeName(info.name,info.code);
-     if(pref) openEditor(pref);
-   }
+}
+
+function refreshMapColors(){
+ document.querySelectorAll("#japanMap .prefecture").forEach(pref=>{
+   const name=pref.dataset.prefName;
+   pref.classList.toggle("visited",!!data[name]);
  });
 }
+
 function render(){
  const entries=Object.entries(data);
  $("visited").textContent=entries.length;
  $("photos").textContent=entries.filter(([,m])=>m.photo).length;
  $("percent").textContent=Math.round(entries.length/47*100);
- const list=$("memoryList");list.innerHTML="";
+
+ const list=$("memoryList");
+ list.innerHTML="";
  entries.forEach(([p,m])=>{
-   const a=document.createElement("article");a.className="memory";a.onclick=()=>openEditor(p);
+   const a=document.createElement("article");
+   a.className="memory";
+   a.onclick=()=>openEditor(p);
    a.innerHTML=`${m.photo?`<img src="${m.photo}">`:`<div class="ph">📍</div>`}<div class="mbody"><h3>${p}</h3><small>${m.date||"日付なし"}</small><p>${esc(m.note)}</p></div>`;
    list.appendChild(a);
  });
- if(!entries.length) list.innerHTML='<div class="empty">まだ思い出がありません。<br>日本地図の都道府県をタップして登録しよう 📷</div>';
- buildMap();
+ if(!entries.length){
+   list.innerHTML='<div class="empty">まだ思い出がありません。<br>日本地図の都道府県をタップして登録しよう 📷</div>';
+ }
+ refreshMapColors();
 }
+
 function openEditor(p){
- selected=p;pendingPhoto=data[p]?.photo||"";
- $("prefTitle").textContent=p;$("dateInput").value=data[p]?.date||"";$("noteInput").value=data[p]?.note||"";
- showPreview(pendingPhoto);$("deleteBtn").style.visibility=data[p]?"visible":"hidden";$("editor").showModal();
+ selected=p;
+ pendingPhoto=data[p]?.photo||"";
+ $("prefTitle").textContent=p;
+ $("dateInput").value=data[p]?.date||"";
+ $("noteInput").value=data[p]?.note||"";
+ showPreview(pendingPhoto);
+ $("deleteBtn").style.visibility=data[p]?"visible":"hidden";
+ $("editor").showModal();
 }
-function showPreview(src){const im=$("preview");if(src){im.src=src;im.style.display="block"}else{im.removeAttribute("src");im.style.display="none"}}
-$("photoInput").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingPhoto=r.result;showPreview(pendingPhoto)};r.readAsDataURL(f)};
-$("memoryForm").onsubmit=e=>{e.preventDefault();data[selected]={date:$("dateInput").value,note:$("noteInput").value,photo:pendingPhoto};localStorage.setItem("omoideMap",JSON.stringify(data));$("editor").close();$("photoInput").value="";render()};
-$("deleteBtn").onclick=()=>{if(confirm(selected+"の思い出を削除する？")){delete data[selected];localStorage.setItem("omoideMap",JSON.stringify(data));$("editor").close();render()}};
+
+function showPreview(src){
+ const im=$("preview");
+ if(src){im.src=src;im.style.display="block"}
+ else{im.removeAttribute("src");im.style.display="none"}
+}
+
+$("photoInput").onchange=e=>{
+ const f=e.target.files[0];
+ if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{pendingPhoto=r.result;showPreview(pendingPhoto)};
+ r.readAsDataURL(f);
+};
+
+$("memoryForm").onsubmit=e=>{
+ e.preventDefault();
+ data[selected]={
+   date:$("dateInput").value,
+   note:$("noteInput").value,
+   photo:pendingPhoto
+ };
+ localStorage.setItem("omoideMap",JSON.stringify(data));
+ $("editor").close();
+ $("photoInput").value="";
+ render();
+};
+
+$("deleteBtn").onclick=()=>{
+ if(confirm(selected+"の思い出を削除する？")){
+   delete data[selected];
+   localStorage.setItem("omoideMap",JSON.stringify(data));
+   $("editor").close();
+   render();
+ }
+};
+
 $("closeBtn").onclick=()=>$("editor").close();
-$("resetBtn").onclick=()=>{if(confirm("すべての思い出を消す？")){data={};localStorage.setItem("omoideMap","{}");render()}};
-window.addEventListener("load",()=>{if(window.jpmap)render();else alert("地図の読み込みに失敗しました。通信を確認して再読み込みしてください。")});
+
+$("resetBtn").onclick=()=>{
+ if(confirm("すべての思い出を消す？")){
+   data={};
+   localStorage.setItem("omoideMap","{}");
+   render();
+ }
+};
+
+window.addEventListener("DOMContentLoaded",async()=>{
+ render();
+ await loadMap();
+});
 </script>
-</body></html>
+</body>
+</html>
