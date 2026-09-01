@@ -77,6 +77,14 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;paddin
 .actions button{border:0;border-radius:12px;padding:12px;font-weight:700}
 .primary{flex:1;background:var(--green);color:#fff}
 .danger{background:#f7e9ec;color:#a55f6d}
+
+.photo-count{margin-top:8px;text-align:right;font-size:10px;color:var(--muted)}
+.photo-preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.photo-thumb{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#edf4f1}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb button{position:absolute;right:4px;top:4px;width:24px;height:24px;border:0;border-radius:50%;background:#0009;color:#fff;font-size:15px;padding:0}
+.photo-thumb .cover{position:absolute;left:4px;bottom:4px;background:#ffffffdd;color:var(--green);font-size:8px;padding:3px 6px;border-radius:999px;font-weight:700}
+
 @media(max-width:430px){
  .maparea{min-height:500px;padding:10px 4px}
  #japanMap svg{max-height:475px!important}
@@ -117,15 +125,18 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;paddin
 <div class="dhead"><div><small>TRAVEL MEMORY</small><h2 id="prefTitle"></h2></div><button type="button" id="closeBtn" class="x">×</button></div>
 <label>行った日<input id="dateInput" type="date"></label>
 <label>思い出メモ<textarea id="noteInput" rows="3" placeholder="ここで何した？"></textarea></label>
-<label class="upload">📷 写真を選ぶ<input id="photoInput" type="file" accept="image/*"></label>
-<img id="preview" class="preview" alt="">
+<label class="upload">📷 写真を追加（最大5枚）
+<input id="photoInput" type="file" accept="image/*" multiple>
+</label>
+<div class="photo-count" id="photoCountText">0 / 5枚</div>
+<div id="photoPreviewGrid" class="photo-preview-grid"></div>
 <div class="actions"><button type="button" id="deleteBtn" class="danger">削除</button><button type="submit" class="primary">思い出を保存 ♡</button></div>
 </form></dialog>
 
 <script>
 const codeToPref={"01": "北海道", "02": "青森県", "03": "岩手県", "04": "宮城県", "05": "秋田県", "06": "山形県", "07": "福島県", "08": "茨城県", "09": "栃木県", "10": "群馬県", "11": "埼玉県", "12": "千葉県", "13": "東京都", "14": "神奈川県", "15": "新潟県", "16": "富山県", "17": "石川県", "18": "福井県", "19": "山梨県", "20": "長野県", "21": "岐阜県", "22": "静岡県", "23": "愛知県", "24": "三重県", "25": "滋賀県", "26": "京都府", "27": "大阪府", "28": "兵庫県", "29": "奈良県", "30": "和歌山県", "31": "鳥取県", "32": "島根県", "33": "岡山県", "34": "広島県", "35": "山口県", "36": "徳島県", "37": "香川県", "38": "愛媛県", "39": "高知県", "40": "福岡県", "41": "佐賀県", "42": "長崎県", "43": "熊本県", "44": "大分県", "45": "宮崎県", "46": "鹿児島県", "47": "沖縄県"};
 let data=JSON.parse(localStorage.getItem("omoideMap")||"{}");
-let selected="", pendingPhoto="";
+let selected="", pendingPhotos=[];
 const $=id=>document.getElementById(id);
 
 function esc(s){
@@ -191,10 +202,69 @@ function refreshMapColors(){
  });
 }
 
+
+function getPhotos(m){
+  if(!m) return [];
+  if(Array.isArray(m.photos)) return m.photos.slice(0,5);
+  if(m.photo) return [m.photo];
+  return [];
+}
+
+function migrateOldPhotoData(){
+  let changed=false;
+  Object.keys(data).forEach(k=>{
+    const m=data[k];
+    if(m && !Array.isArray(m.photos) && m.photo){
+      m.photos=[m.photo];
+      delete m.photo;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("omoideMap",JSON.stringify(data));
+}
+
+function updatePhotoPreview(){
+  const grid=$("photoPreviewGrid");
+  grid.innerHTML="";
+  pendingPhotos.forEach((src,i)=>{
+    const box=document.createElement("div");
+    box.className="photo-thumb";
+    box.innerHTML=`<img src="${src}" alt="写真${i+1}">${i===0?'<span class="cover">表紙</span>':''}<button type="button">×</button>`;
+    box.querySelector("button").onclick=()=>{
+      pendingPhotos.splice(i,1);
+      updatePhotoPreview();
+    };
+    grid.appendChild(box);
+  });
+  $("photoCountText").textContent=`${pendingPhotos.length} / 5枚`;
+}
+
+function compressImage(file,maxSide=1280,quality=.72){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const scale=Math.min(1,maxSide/Math.max(img.width,img.height));
+        const w=Math.max(1,Math.round(img.width*scale));
+        const h=Math.max(1,Math.round(img.height*scale));
+        const c=document.createElement("canvas");
+        c.width=w;c.height=h;
+        c.getContext("2d").drawImage(img,0,0,w,h);
+        resolve(c.toDataURL("image/jpeg",quality));
+      };
+      img.onerror=reject;
+      img.src=r.result;
+    };
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+
 function render(){
  const entries=Object.entries(data);
  $("visited").textContent=entries.length;
- $("photos").textContent=entries.filter(([,m])=>m.photo).length;
+ $("photos").textContent=entries.reduce((n,[,m])=>n+getPhotos(m).length,0);
  $("percent").textContent=Math.round(entries.length/47*100);
 
  const list=$("memoryList");
@@ -203,7 +273,7 @@ function render(){
    const a=document.createElement("article");
    a.className="memory";
    a.onclick=()=>openEditor(p);
-   a.innerHTML=`${m.photo?`<img src="${m.photo}">`:`<div class="ph">📍</div>`}<div class="mbody"><h3>${p}</h3><small>${m.date||"日付なし"}</small><p>${esc(m.note)}</p></div>`;
+   a.innerHTML=`${getPhotos(m).length?`<img src="${getPhotos(m)[0]}">`:`<div class="ph">📍</div>`}<div class="mbody"><h3>${p}</h3><small>${m.date||"日付なし"}</small><p>${esc(m.note)}</p></div>`;
    list.appendChild(a);
  });
  if(!entries.length){
@@ -214,27 +284,35 @@ function render(){
 
 function openEditor(p){
  selected=p;
- pendingPhoto=data[p]?.photo||"";
+ pendingPhotos=getPhotos(data[p]);
  $("prefTitle").textContent=p;
  $("dateInput").value=data[p]?.date||"";
  $("noteInput").value=data[p]?.note||"";
- showPreview(pendingPhoto);
+ updatePhotoPreview();
  $("deleteBtn").style.visibility=data[p]?"visible":"hidden";
  $("editor").showModal();
 }
 
-function showPreview(src){
- const im=$("preview");
- if(src){im.src=src;im.style.display="block"}
- else{im.removeAttribute("src");im.style.display="none"}
-}
-
-$("photoInput").onchange=e=>{
- const f=e.target.files[0];
- if(!f)return;
- const r=new FileReader();
- r.onload=()=>{pendingPhoto=r.result;showPreview(pendingPhoto)};
- r.readAsDataURL(f);
+$("photoInput").onchange=async e=>{
+ const files=[...e.target.files];
+ if(!files.length)return;
+ const room=5-pendingPhotos.length;
+ if(room<=0){
+   alert("写真は1つの都道府県につき5枚までです。");
+   e.target.value="";
+   return;
+ }
+ const selectedFiles=files.slice(0,room);
+ try{
+   for(const f of selectedFiles){
+     pendingPhotos.push(await compressImage(f));
+   }
+   updatePhotoPreview();
+   if(files.length>room) alert(`最大5枚なので、${room}枚だけ追加しました。`);
+ }catch(err){
+   alert("写真の読み込みに失敗しました。");
+ }
+ e.target.value="";
 };
 
 $("memoryForm").onsubmit=e=>{
@@ -242,7 +320,7 @@ $("memoryForm").onsubmit=e=>{
  data[selected]={
    date:$("dateInput").value,
    note:$("noteInput").value,
-   photo:pendingPhoto
+   photos:pendingPhotos.slice(0,5)
  };
  localStorage.setItem("omoideMap",JSON.stringify(data));
  $("editor").close();
@@ -270,6 +348,7 @@ $("resetBtn").onclick=()=>{
 };
 
 window.addEventListener("DOMContentLoaded",async()=>{
+ migrateOldPhotoData();
  render();
  await loadMap();
 });
